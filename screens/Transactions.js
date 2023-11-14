@@ -1,11 +1,13 @@
 import React, {Component} from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 export default class TransactionScreen extends Component{
     render(){
         return(
             <View style={styles.container}>
-                <Text style={styles.text}>Tela de Transação</Text>
+                <TouchableOpacity>
+                    <Text>Digitalizar QR Code</Text>
+                </TouchableOpacity>
             </View>
         );
     }
