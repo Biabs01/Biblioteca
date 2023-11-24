@@ -22,11 +22,31 @@ export default class TransactionScreen extends Component{
             domState: domState,
             scanned: 'false'
         });
-    }
+    };
+
+    handleBarCodeScanned = async = ({type, data}) => {
+        this.setState({
+            scannedData: data,
+            domState: "normal",
+            scanned: true
+        });
+    };
 
     render(){
+        const {domState, hasCameraPermissions, scannedData, scanned} = this.state;
+        if(domState === "scanner"){
+            return(
+                <BarCodeScanner
+                    onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
+                    style={StyleSheet.absoluteFillObject}
+                />
+            );
+        }
         return(
             <View style={styles.container}>
+                <Text style={styles.text}>
+                    {hasCameraPermissions ? scannedData : "Solicitar permissão da Câmera"}
+                </Text>
                 <TouchableOpacity
                     onPress={() => this.getCameraPermissions("scanner")}>
                     <Text>Digitalizar QR Code</Text>
@@ -34,6 +54,7 @@ export default class TransactionScreen extends Component{
             </View>
         );
     }
+    
 }
 
 const styles = StyleSheet.create({
