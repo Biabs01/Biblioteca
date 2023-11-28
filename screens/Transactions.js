@@ -2,6 +2,7 @@ import React, {Component} from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import * as Permissions from 'expo-permissions';
 import { BarCodeScanner } from "expo-barcode-scanner";
+import { TextInput } from "react-native-gesture-handler";
 
 export default class TransactionScreen extends Component{
     constructor(props){
@@ -10,7 +11,9 @@ export default class TransactionScreen extends Component{
             domState: 'normal',
             hasCameraPermissions: null,
             scanned: 'false',
-            scannedData: ''
+            scannedData: '',
+            bookId: '',
+            studentId: ''
         };
     }
 
@@ -25,16 +28,21 @@ export default class TransactionScreen extends Component{
     };
 
     handleBarCodeScanned = async = ({type, data}) => {
-        this.setState({
-            scannedData: data,
-            domState: "normal",
-            scanned: true
-        });
+        const {domState} = this.state;
+
+        if(domState === 'bookId'){
+            this.setState({
+                bookId: data,
+                domState: "normal",
+                scanned: true
+            });
+        }
     };
 
     render(){
-        const {domState, hasCameraPermissions, scannedData, scanned} = this.state;
-        if(domState === "scanner"){
+        const {bookId, studentId, domState, scanned} = this.state;
+
+        if(domState !== "normal"){
             return(
                 <BarCodeScanner
                     onBarCodeScanned={scanned ? undefined : this.handleBarCodeScanned}
@@ -44,6 +52,21 @@ export default class TransactionScreen extends Component{
         }
         return(
             <View style={styles.container}>
+                <View style={styles.lowerContainer}>
+                    <View style={styles.textinputContainer}>
+                        <TextInput
+                            style={styles.textinput}
+                            placeholder={"id do Livro"}
+                            placeholderTextColor={"#FFFFFF"}
+                            value={bookId}
+                        />
+                        <TouchableOpacity
+                            style={styles.scanbutton}
+                            onPress={() => this.getCameraPermissions("bookId")}>
+                                <Text style={styles.scanbuttonText}>Scan</Text>
+                            </TouchableOpacity>
+                    </View>
+                </View>
                 <Text style={styles.text}>
                     {hasCameraPermissions ? scannedData : "Solicitar permissão da Câmera"}
                 </Text>
