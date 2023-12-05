@@ -11,7 +11,6 @@ export default class TransactionScreen extends Component{
             domState: 'normal',
             hasCameraPermissions: null,
             scanned: 'false',
-            scannedData: '',
             bookId: '',
             studentId: ''
         };
@@ -23,7 +22,7 @@ export default class TransactionScreen extends Component{
         this.setState({
             hasCameraPermissions: status === 'granted',
             domState: domState,
-            scanned: 'false'
+            scanned: false
         });
     };
 
@@ -33,6 +32,12 @@ export default class TransactionScreen extends Component{
         if(domState === 'bookId'){
             this.setState({
                 bookId: data,
+                domState: "normal",
+                scanned: true
+            });
+        } else if(domState === 'studentId'){
+            this.setState({
+                studentId: data,
                 domState: "normal",
                 scanned: true
             });
@@ -66,13 +71,22 @@ export default class TransactionScreen extends Component{
                                 <Text style={styles.scanbuttonText}>Scan</Text>
                             </TouchableOpacity>
                     </View>
+                    <View style={styles.textinputContainer}>
+                        <TextInput
+                            style={styles.textinput}
+                            placeholder={"id do Aluno"}
+                            placeholderTextColor={"#FFFFFF"}
+                            value={studentId}
+                        />
+                        <TouchableOpacity
+                            style={styles.scanbutton}
+                            onPress={() => this.getCameraPermissions("studentId")}>
+                                <Text style={styles.scanbuttonText}>Scan</Text>
+                            </TouchableOpacity>
+                    </View>
                 </View>
-                <Text style={styles.text}>
-                    {hasCameraPermissions ? scannedData : "Solicitar permissão da Câmera"}
-                </Text>
-                <TouchableOpacity
-                    onPress={() => this.getCameraPermissions("scanner")}>
-                    <Text>Digitalizar QR Code</Text>
+                <TouchableOpacity>
+                    <Text>Enviar</Text>
                 </TouchableOpacity>
             </View>
         );
@@ -82,13 +96,44 @@ export default class TransactionScreen extends Component{
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#5653D4'
+      flex: 1,
+      backgroundColor: "#FFFFFF"
     },
-    text:{
-        color: "#ffffff",
-        fontSize: 30
+    lowerContainer: {
+      flex: 0.5,
+      alignItems: "center"
+    },
+    textinputContainer: {
+      borderWidth: 2,
+      borderRadius: 10,
+      flexDirection: "row",
+      backgroundColor: "#9DFD24",
+      borderColor: "#FFFFFF"
+    },
+    textinput: {
+      width: "57%",
+      height: 50,
+      padding: 10,
+      borderColor: "#FFFFFF",
+      borderRadius: 10,
+      borderWidth: 3,
+      fontSize: 18,
+      backgroundColor: "#5653D4",
+      color: "#FFFFFF"
+    },
+    scanbutton: {
+      width: 100,
+      height: 50,
+      backgroundColor: "#9DFD24",
+      borderTopRightRadius: 10,
+      borderBottomRightRadius: 10,
+      justifyContent: "center",
+      alignItems: "center"
+    },
+    scanbuttonText: {
+      fontSize: 24,
+      color: "#0A0101",
     }
-})
+   
+     
+   });
