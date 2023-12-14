@@ -85,8 +85,10 @@ export default class TransactionScreen extends Component{
                             </TouchableOpacity>
                     </View>
                 </View>
-                <TouchableOpacity>
-                    <Text>Enviar</Text>
+                <TouchableOpacity
+                    style={[styles.scanbutton, {margin: 25}]}
+                >
+                    <Text style={styles.buttonText}>Enviar</Text>
                 </TouchableOpacity>
             </View>
         );
