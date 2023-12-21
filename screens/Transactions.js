@@ -44,6 +44,10 @@ export default class TransactionScreen extends Component{
         }
     };
 
+    handleTransaction = () => {
+
+    }
+
     render(){
         const {bookId, studentId, domState, scanned} = this.state;
 
@@ -87,6 +91,7 @@ export default class TransactionScreen extends Component{
                 </View>
                 <TouchableOpacity
                     style={[styles.scanbutton, {margin: 25}]}
+                    onPress={this.handleTransaction}
                 >
                     <Text style={styles.buttonText}>Enviar</Text>
                 </TouchableOpacity>
@@ -135,7 +140,14 @@ const styles = StyleSheet.create({
     scanbuttonText: {
       fontSize: 24,
       color: "#0A0101",
+    },
+    button: {
+        width: "43%",
+        height: 55,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F48D20',
+        borderRadius: 15
     }
-   
-     
+    
    });
