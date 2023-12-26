@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import * as Permissions from 'expo-permissions';
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { TextInput } from "react-native-gesture-handler";
+import db from '../config.js';
 
 export default class TransactionScreen extends Component{
     constructor(props){
@@ -12,7 +13,9 @@ export default class TransactionScreen extends Component{
             hasCameraPermissions: null,
             scanned: 'false',
             bookId: '',
-            studentId: ''
+            studentId: '',
+            bookName: '',
+            studentName: ''
         };
     }
 
@@ -47,6 +50,36 @@ export default class TransactionScreen extends Component{
     handleTransaction = () => {
 
     }
+
+    getBookDetails = bookId => {
+        bookId = bookId.trim();
+        db.collection("books")
+            .where("book_id", "==", bookId)
+            .get()
+            .then(snapshot => {
+                snapshot.docs.map(doc => {
+                    this.setState({
+                        bookName: doc.data().book_details.book_name
+                    });
+                });
+            });
+    };
+
+    getStudentDetails = studentId => {
+        studentId = studentId.trim();
+        db.collection("students")
+            .where("student_id", "==", studentId)
+            .get()
+            .then(snapshot => {
+                snapshot.docs.map(doc => {
+                    this.setState({
+                        studentName: doc.data().student_details.student_name
+                    });
+                });
+            });
+    };
+
+
 
     render(){
         const {bookId, studentId, domState, scanned} = this.state;

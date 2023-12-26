@@ -1,3 +1,6 @@
+import firebase from 'firebase';
+require('@firebase/firestore');
+
 const firebaseConfig = {
     apiKey: "AIzaSyBD0DSDkA1mO2LpMzcMoPlPokds0f7DKI8",
     authDomain: "bibliotecatq7.firebaseapp.com",
@@ -6,3 +9,6 @@ const firebaseConfig = {
     messagingSenderId: "907276384869",
     appId: "1:907276384869:web:42d612e4a73ddcd9b7a48c"
   };
+
+  firebase.initializeApp(firebaseConfig);
+  export default firebase.firestore();
