@@ -47,10 +47,6 @@ export default class TransactionScreen extends Component{
         }
     };
 
-    handleTransaction = () => {
-
-    }
-
     getBookDetails = bookId => {
         bookId = bookId.trim();
         db.collection("books")
@@ -79,7 +75,67 @@ export default class TransactionScreen extends Component{
             });
     };
 
+    initiateBookIssue = async (bookId, studentId, bookName, studentName) => {
+        db.collection("transactions").add({
+            student_id: studentId,
+            student_name: studentName,
+            book_id: bookId,
+            book_name: bookName,
+            date: firebase.firestore.Timestamp.now().toDate(),
+            transaction_type: 'issue'
+        });
 
+        db.collection("books")
+            .doc(bookId)
+            .update({
+                is_book_available: false
+            });
+        
+        db.collection("students")
+            .doc(studentId)
+            .update({
+                number_of_books_issued: firebase.firestore.FieldValue.increment(1)
+            });
+        
+        this.setState({
+            bookId: '',
+            studentId: ''
+        });
+    }
+
+    initiateBookReturn = async (bookId, studentId, bookName, studentName) => {
+        db.collection("transactions").add({
+            student_id: studentId,
+            student_name: studentName,
+            book_id: bookId,
+            book_name: bookName,
+            date: firebase.firestore.Timestamp.now().toDate(),
+            transaction_type: 'return'
+        });
+
+        db.collection("books")
+            .doc(bookId)
+            .update({
+                is_book_available: false
+            });
+        
+        db.collection("students")
+            .doc(studentId)
+            .update({
+                number_of_books_issued: firebase.firestore.FieldValue.increment(-1)
+            });
+        
+        this.setState({
+            bookId: '',
+            studentId: ''
+        });
+    }
+
+    handleTransaction = async () => {
+        var { bookId, studentId } = this.state;
+        await this.getBookDetails(bookId);
+        await this.getStudentDetails(studentId);
+    }
 
     render(){
         const {bookId, studentId, domState, scanned} = this.state;
