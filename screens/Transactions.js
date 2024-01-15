@@ -1,5 +1,5 @@
 import React, {Component} from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView } from "react-native";
 import * as Permissions from 'expo-permissions';
 import { BarCodeScanner } from "expo-barcode-scanner";
 import { TextInput } from "react-native-gesture-handler";
@@ -47,7 +47,7 @@ export default class TransactionScreen extends Component{
         }
     };
 
-    getBookDetails = bookId => {
+    getBookDetails = async bookId => {
         bookId = bookId.trim();
         db.collection("books")
             .where("book_id", "==", bookId)
@@ -61,7 +61,7 @@ export default class TransactionScreen extends Component{
             });
     };
 
-    getStudentDetails = studentId => {
+    getStudentDetails = async studentId => {
         studentId = studentId.trim();
         db.collection("students")
             .where("student_id", "==", studentId)
@@ -116,7 +116,7 @@ export default class TransactionScreen extends Component{
         db.collection("books")
             .doc(bookId)
             .update({
-                is_book_available: false
+                is_book_available: true
             });
         
         db.collection("students")
@@ -135,6 +135,22 @@ export default class TransactionScreen extends Component{
         var { bookId, studentId } = this.state;
         await this.getBookDetails(bookId);
         await this.getStudentDetails(studentId);
+
+        db.collection("books")
+            .doc(bookId)
+            .get()
+            .then(doc => {
+                var book = doc.data();
+                if(book.is_book_available){
+                    var {bookName, studentName} = this.state;
+                    this.initiateBookIssue(bookId, studentId, bookName, studentName);
+                    Alert.alert("O livro foi entregue ao aluno!");
+                } else {
+                    var {bookName, studentName} = this.state;
+                    this.initiateBookReturn(bookId, studentId, bookName, studentName);
+                    Alert.alert("O livro foi devolvido à biblioteca!");
+                }
+            })
     }
 
     render(){
@@ -149,7 +165,7 @@ export default class TransactionScreen extends Component{
             );
         }
         return(
-            <View style={styles.container}>
+            <KeyboardAvoidingView behavior="padding" style={styles.container}>
                 <View style={styles.lowerContainer}>
                     <View style={styles.textinputContainer}>
                         <TextInput
@@ -157,6 +173,9 @@ export default class TransactionScreen extends Component{
                             placeholder={"id do Livro"}
                             placeholderTextColor={"#FFFFFF"}
                             value={bookId}
+                            onChangeText={text => this.setState({
+                                bookId: text
+                            })}
                         />
                         <TouchableOpacity
                             style={styles.scanbutton}
@@ -170,6 +189,9 @@ export default class TransactionScreen extends Component{
                             placeholder={"id do Aluno"}
                             placeholderTextColor={"#FFFFFF"}
                             value={studentId}
+                            onChangeText={text => this.setState({
+                                studentId: text
+                            })}
                         />
                         <TouchableOpacity
                             style={styles.scanbutton}
@@ -184,7 +206,7 @@ export default class TransactionScreen extends Component{
                 >
                     <Text style={styles.buttonText}>Enviar</Text>
                 </TouchableOpacity>
-            </View>
+            </KeyboardAvoidingView>
         );
     }
     
