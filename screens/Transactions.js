@@ -131,6 +131,24 @@ export default class TransactionScreen extends Component{
         });
     }
 
+    checkBookAvailability = async bookId => {
+        var bookRef = await db
+            .collection('books')
+            .where('book_id', '==', bookId)
+            .get()
+
+        var transactionType = '';
+        if(bookRef.docs.length == 0){
+            transactionType = false;
+        } else {
+            bookRef.docs.map(doc => {
+                transactionType = doc.data().is_book_available ? 'issue' : 'return';
+            });
+        }
+
+        return transactionType;
+    }
+
     handleTransaction = async () => {
         var { bookId, studentId } = this.state;
         await this.getBookDetails(bookId);
