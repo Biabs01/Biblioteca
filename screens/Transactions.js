@@ -149,26 +149,45 @@ export default class TransactionScreen extends Component{
         return transactionType;
     }
 
+    checkStudentEligibilityforBookIssue = async studentId => {
+        const studentRef = await db
+            .collection("students")
+            .where("student_id", "==", studentId)
+            .get()
+
+        var isStudentElegible = '';
+        if(studentRef.docs.length == 0){
+            isStudentElegible = false;
+            this.setState({
+                bookId: '',
+                studentId: ''
+            });
+            Alert.alert("O id do aluno não existe na base de dados da biblioteca");
+        }
+    }
+
     handleTransaction = async () => {
         var { bookId, studentId } = this.state;
         await this.getBookDetails(bookId);
         await this.getStudentDetails(studentId);
 
-        db.collection("books")
-            .doc(bookId)
-            .get()
-            .then(doc => {
-                var book = doc.data();
-                if(book.is_book_available){
-                    var {bookName, studentName} = this.state;
-                    this.initiateBookIssue(bookId, studentId, bookName, studentName);
-                    Alert.alert("O livro foi entregue ao aluno!");
-                } else {
-                    var {bookName, studentName} = this.state;
-                    this.initiateBookReturn(bookId, studentId, bookName, studentName);
-                    Alert.alert("O livro foi devolvido à biblioteca!");
-                }
-            })
+        var transactionType = await this.checkBookAvailability(bookId);
+
+        if(!transactionType){
+            this.setState({
+                bookId: '',
+                studentId: ''
+            });
+            Alert.alert("O livro não existe na base de dados da biblioteca")
+        } else if(transactionType === 'issue'){
+            var {bookName, studentName} = this.state;
+            this.initiateBookIssue(bookId, studentId, bookName, studentName);
+            Alert.alert("O livro foi entregue ao aluno!");
+        } else {
+            var {bookName, studentName} = this.state;
+            this.initiateBookReturn(bookId, studentId, bookName, studentName);
+            Alert.alert("O livro foi devolvido à biblioteca!");
+        }
     }
 
     render(){
