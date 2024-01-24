@@ -163,7 +163,45 @@ export default class TransactionScreen extends Component{
                 studentId: ''
             });
             Alert.alert("O id do aluno não existe na base de dados da biblioteca");
+        } else {
+            studentRef.docs.map(doc => {
+                if(doc.data().number_of_books_issued < 2){
+                    isStudentElegible = true;
+                } else {
+                    isStudentElegible = false;
+                    this.setState({
+                        bookId: '',
+                        studentId: ''
+                    });
+                    Alert.alert("O aluno já retirou 2 livros!");
+                }
+            });
         }
+        return isStudentElegible;
+    }
+
+    checkStudentEligibilityforBookReturn = async (bookId, studentId) => {
+        const studentRef = await db
+            .collection("transactions")
+            .where("book_id", "==", bookId)
+            .limit(1)
+            .get();
+
+        var isStudentElegible = '';
+            studentRef.docs.map(doc => {
+                var lastBookTransaction = doc.data();
+                if(lastBookTransaction.student_id === studentId){
+                    isStudentElegible = true;
+                } else {
+                    isStudentElegible = false;
+                    this.setState({
+                        bookId: '',
+                        studentId: ''
+                    });
+                    Alert.alert("O livro não foi retirado por este aluno!");
+                }
+            });
+        return isStudentElegible;
     }
 
     handleTransaction = async () => {
@@ -178,15 +216,25 @@ export default class TransactionScreen extends Component{
                 bookId: '',
                 studentId: ''
             });
-            Alert.alert("O livro não existe na base de dados da biblioteca")
+            Alert.alert("O livro não existe na base de dados da biblioteca");
+            
         } else if(transactionType === 'issue'){
-            var {bookName, studentName} = this.state;
-            this.initiateBookIssue(bookId, studentId, bookName, studentName);
-            Alert.alert("O livro foi entregue ao aluno!");
+            var isElegible = await this.checkStudentEligibilityforBookIssue(studentId)
+                            
+            if(isElegible){
+                var {bookName, studentName} = this.state;
+                this.initiateBookIssue(bookId, studentId, bookName, studentName);
+                Alert.alert("O livro foi entregue ao aluno!");
+            }
+
         } else {
-            var {bookName, studentName} = this.state;
-            this.initiateBookReturn(bookId, studentId, bookName, studentName);
-            Alert.alert("O livro foi devolvido à biblioteca!");
+            var isElegible = await this.checkStudentEligibilityforBookReturn(bookId, studentId);
+
+            if(isElegible){
+                var {bookName, studentName} = this.state;
+                this.initiateBookReturn(bookId, studentId, bookName, studentName);
+                Alert.alert("O livro foi devolvido à biblioteca!"); 
+            } 
         }
     }
 
