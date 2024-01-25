@@ -282,7 +282,7 @@ export default class TransactionScreen extends Component{
                             style={styles.scanbutton}
                             onPress={() => this.getCameraPermissions("studentId")}>
                                 <Text style={styles.scanbuttonText}>Scan</Text>
-                            </TouchableOpacity>
+                        </TouchableOpacity>
                     </View>
                 </View>
                 <TouchableOpacity
